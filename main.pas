@@ -1,17 +1,45 @@
-﻿uses GraphABC,Timers,MyPlayground,MyApple,MySnake;
+﻿uses GraphABC,Timers,MyPlayground,MyApple,MySnake,MyQueue;
 var
   x1, y1, x2, y2, cellSize: integer;
   playground: MyPlayground.Playground;
+  arrayOfEmptys:MyQueue.Queue = MyQueue.Queue.Create();
   speed:integer := 500;
   iterator:integer := 0;
+  timer:Timers.Timer;
   
 procedure SnakeHandler();
+var
+  snakeHeadX:integer;
+  snakeHeadY:integer;
 begin
   playground.snake.Move();
   
-  if (playground.snake.GetHead()[0] = playground.apple.x) and (playground.snake.GetHead()[1] = playground.apple.y) then begin
+  snakeHeadX := playground.snake.GetHead()[0];
+  snakeHeadY := playground.snake.GetHead()[1];
+  
+  if (snakeHeadX = playground.apple.x) and (snakeHeadY = playground.apple.y) then begin
     playground.snake.snakeGrow := true;
+    playground.apple.RemoveApple();
+    arrayOfEmptys:=playground.GetArrayOfEmptys();
+    
+    playground.apple.SetApple(arrayOfEmptys);
   end;
+  
+  writeln('kek: ',snakeHeadX,' ',snakeHeadY,'; ',playground.ItShouldBe(snakeHeadX, snakeHeadY).ToString);
+  if (playground.ItShouldBeBorder(snakeHeadX, snakeHeadY)) or (playground.ItShouldBeSnake(snakeHeadX, snakeHeadY)) then begin
+    writeln('lol');
+    timer.Stop();
+    GraphABC.TextOut(0, GraphABC.Window.Height - 16, 'Game Over');
+    Redraw();
+  end;
+end;
+
+procedure CollisionHandler();
+var
+  snakeHeadX:integer := playground.snake.GetHead()[0];
+  snakeHeadY:integer := playground.snake.GetHead()[1];
+begin
+  
 end;
   
 procedure KeyDown(Key:integer);
@@ -29,20 +57,24 @@ begin
   LockDrawing();
   
   GraphABC.ClearWindow();
-  SnakeHandler();
+  
+  SnakeHandler(); // Обработчик движения змейки
   
   playground.Update();
   playground.Render();
   
+  CollisionHandler(); // Обработчик столкновений
+  
   GraphABC.TextOut(0, 0, iterator.ToString());
   GraphABC.TextOut(0, 16, 'snake head: [' + playground.snake.GetHead()[0].ToString() + '][' + playground.snake.GetHead()[1].ToString());
+  GraphABC.TextOut(0,48,'Apple: ['+playground.apple.GetApple[0].ToString+']['+playground.apple.GetApple[1].ToString+']');
   Inc(iterator);
   
   Redraw();
 end;
 
 begin
-  var timer := Timers.Timer.Create(speed, Update);
+  timer := Timers.Timer.Create(speed, Update);
   timer.Start();
   
   OnKeyDown := KeyDown;
@@ -54,4 +86,7 @@ begin
   cellSize := 20;
   
   playground := MyPlayground.Playground.Create(x1, y1, x2, y2, cellSize);
+  playground.Render();
+  arrayOfEmptys := playground.GetArrayOfEmptys();
+  writeln('AAAA:',arrayOfEmptys.queue);
 end.

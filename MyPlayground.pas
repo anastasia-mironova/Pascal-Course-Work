@@ -2,7 +2,7 @@
 
 interface
 
-uses GraphABC, MySnake, MyApple;
+uses GraphABC, MySnake, MyApple, MyQueue;
 type
   Playground = class
     x1: integer;
@@ -12,10 +12,11 @@ type
     cellSize: integer;
     field: array [,] of integer;
     
-    emptyId :integer := 0;
-    borderId: integer := 1;
-    snakeId: integer := 2;
-    appleId: integer := 3;
+    const emptyId :integer = 0;
+    const borderId: integer = 1;
+    const snakeId: integer = 2;
+    const snakeHeadId :integer = 4;
+    const appleId: integer = 3;
     
     snake: MySnake.Snake;
     apple: MyApple.Apple;
@@ -29,6 +30,10 @@ type
     
     function GetArrayOfEmptys():MyQueue.Queue;
     function ItShouldBe(x:integer; y:integer):string;
+    function ItShouldBeBorder(x:integer; y:integer):boolean;
+    function ItShouldBeApple(x:integer; y:integer):boolean;
+    function ItShouldBeSnake(x:integer; y:integer):boolean;
+    function ItShouldBeSnakeHead(x:integer; y:integer):boolean;
     function Width(): integer;
     function Heigth(): integer;
     function Columns(): integer;
@@ -62,6 +67,7 @@ begin
         'Border': field[i, j] := borderId;
         'Apple': field[i, j] := appleId;
         'Snake': field[i, j] := snakeId;
+        'Snake Head': field[i, j] :=snakeHeadId;
         'Empty': field[i, j] := emptyId;
       end;
     end;
@@ -78,43 +84,37 @@ begin
 end;
 
 procedure Playground.Render();
+var
+  currentColor:GraphABC.Color;
 begin
   GraphABC.SetPenColor(clDarkBlue);
   GraphABC.DrawRectangle(x1, y1, x2 + 1, y2 + 1);
   
   for var i := 1 to Columns() - 1 do 
   begin
-    GraphABC.SetPenColor(clFirebrick);
+    GraphABC.SetPenColor(rgb(211, 211, 211));
     GraphABC.Line(x1 + i * cellSize, y1, x1 + i * cellSize, y2);
   end;
   
   for var i := 1 to Rows() - 1 do 
   begin
-    GraphABC.SetPenColor(clFirebrick);
+    GraphABC.SetPenColor(rgb(211, 211, 211));
     GraphABC.Line(x1, y1 + i * cellSize, x2, y1 + i * cellSize);
   end;
   
   for var j := 0 to rows() - 1 do 
     for var i := 0 to columns() - 1 do
     begin
-      if field[i, j] = borderId then begin
-        GraphABC.SetBrushColor(clRed);
-        GraphABC.FillRect(x1 + i * cellsize + 1, y1 + j * cellsize + 1, x1 + i * cellsize + cellsize, y1 + j * cellsize + cellsize);
+      case field[i, j] of
+        borderId : currentColor := rgb(32, 178, 170);
+        snakeId : currentColor := rgb(70, 130, 180);
+        snakeHeadId: currentColor := rgb(238, 130, 238);
+        appleId: currentColor := rgb(144, 238, 144);
+        emptyId: currentColor := rgb(240, 248, 255);
       end;
-      if field[i, j] = snakeId then begin
-        GraphABC.SetBrushColor(clBlue);
-        GraphABC.FillRect(x1 + i * cellsize + 1, y1 + j * cellsize + 1, x1 + i * cellsize + cellsize, y1 + j * cellsize + cellsize);
-      end;
-      if field[i, j] = appleId then begin
-        GraphABC.SetBrushColor(clGreen);
-        GraphABC.FillRect(x1 + i * cellsize + 1, y1 + j * cellsize + 1, x1 + i * cellsize + cellsize, y1 + j * cellsize + cellsize);
-      end;
-      {case field[i,j] of 
-      1:SetBrushColor(clRed);
-      2:SetBrushColor(clBlue);
-      3:SetBrushColor(clGreen);
-      end;
-      GraphABC.FillRect(x1+i*cellsize+1,y1+j*cellsize+1,x1+i*cellsize+cellsize,y1+j*cellsize+cellsize);}
+      
+      GraphABC.SetBrushColor(currentColor);
+      GraphABC.FillRect(x1 + i * cellsize + 1, y1 + j * cellsize + 1, x1 + i * cellsize + cellsize, y1 + j * cellsize + cellsize);
     end;
 end;
 
@@ -124,23 +124,74 @@ begin
 end;
 
 // function
+function Playground.GetArrayOfEmptys():MyQueue.Queue;
+begin
+  Result := MyQueue.Queue.Create();
+  
+  for var j:=0 to Rows()-1 do 
+  begin
+     for var i:=0 to Columns()-1 do
+     begin
+       if (field[i,j]=emptyId)then begin
+        Result.Push(i,j);
+       end;
+     end;
+  end;
+end;
+
+function Playground.ItShouldBeBorder(x:integer; y:integer):boolean;
+begin
+  if (y = 0) or (y = (rows() - 1)) or (x = 0) or (x = columns() - 1) then begin
+    Result := true;
+  end;
+end;
+
+function Playground.ItShouldBeApple(x:integer; y:integer):boolean;
+begin
+  if (apple.x = x) and (apple.y = y) then begin
+    Result := True;
+  end;
+end;
+
+function Playground.ItShouldBeSnake(x:integer; y:integer):boolean;
+begin
+  for var i := 1 to snake.queue.length - 1 do begin
+    if (snake.queue.queue[i, 0] = x) and (snake.queue.queue[i, 1] = y) then begin
+      Result := True;
+      exit;
+    end;
+  end;
+end;
+
+function Playground.ItShouldBeSnakeHead(x:integer; y:integer):boolean;
+begin
+  if (snake.GetHead()[0] = x) and (snake.GetHead()[1] = y) then begin
+    Result := True;
+  end;
+end;
+
 function Playground.ItShouldBe(x:integer; y:integer):string;
 begin
   Result := 'Empty';
-
-  if (apple.x = x) and (apple.y = y) then begin
-    Result := 'Apple';
+  
+  if ItShouldBeSnakeHead(x, y) then begin
+    Result := 'Snake Head';
+    exit;
   end;
   
-  if (y = 0) or (y = (rows() - 1)) or (x = 0) or (x = columns() - 1) then begin
+  if ItShouldBeSnake(x, y) then begin
+    Result := 'Snake';
+    exit;
+  end;
+  
+  if ItShouldBeBorder(x, y) then begin
     Result := 'Border';
+    exit;
   end;
   
-  for var i := 0 to snake.queue.length - 1 do begin
-    if (snake.queue.queue[i, 0] = x) and (snake.queue.queue[i, 1] = y) then begin
-      Result := 'Snake';
-      break;
-    end;
+  if ItShouldBeApple(x, y) then begin
+    Result := 'Apple';
+    exit;
   end;
 end;
 

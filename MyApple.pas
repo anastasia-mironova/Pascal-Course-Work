@@ -1,14 +1,15 @@
 ﻿unit MyApple;
 
 interface
-
+uses MyQueue;
 type
   Apple = class
     x: integer;
     y: integer;
+    arrayOfEmptys: MyQueue.Queue;
     constructor Create(x: integer; y: integer);
     
-    procedure SetApple(x:integer; y:integer);
+    procedure SetApple(arrayOfEmptys:MyQueue.Queue);
     procedure RemoveApple();
     
     function GetApple():array of integer;
@@ -23,10 +24,12 @@ begin
   Self.y := y;
 end;
 
-procedure Apple.SetApple(x:integer; y:integer);
+procedure Apple.SetApple(arrayOfEmptys:MyQueue.Queue);
 begin
-  Self.x := x;
-  Self.y := y;
+  var arrayLength:=arrayOfEmptys.length - 1;
+  var randomIndex:=random(arrayLength);
+  self.x:=arrayOfEmptys.queue[randomIndex,0];
+  self.y:=arrayOfEmptys.queue[randomIndex,1];
 end;
 
 procedure Apple.RemoveApple();

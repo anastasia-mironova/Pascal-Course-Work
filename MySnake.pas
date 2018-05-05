@@ -22,7 +22,8 @@ implementation
 
 constructor Snake.Create(x: integer; y: integer);
 begin
-  queue := MyQueue.Queue.Create(x, y);
+  queue := MyQueue.Queue.Create();
+  queue.Push(x, y);
 end;
 
 function Snake.GetHead(): array of integer;

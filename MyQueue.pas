@@ -8,7 +8,7 @@ type
     queue:array[,] of integer;
     length:integer;
   //public
-    constructor Create(x:integer; y:integer);
+    constructor Create();
     
     procedure Push(x:integer; y:integer);
     procedure Unshift(x:integer; y:integer);
@@ -20,14 +20,11 @@ type
 implementation
 
 // Constructor
-constructor Queue.Create(x:integer; y:integer);
+constructor Queue.Create();
 begin
-  SetLength(queue, 1, 2);
+  SetLength(queue, 0, 2);
   
-  length := 1;
-  
-  queue[length - 1, 0] := x;
-  queue[length - 1, 1] := y;
+  length := 0;
 end;
 
 // Procedures
