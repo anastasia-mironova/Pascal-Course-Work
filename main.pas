@@ -24,10 +24,8 @@ begin
     
     playground.apple.SetApple(arrayOfEmptys);
   end;
-  
-  writeln('kek: ',snakeHeadX,' ',snakeHeadY,'; ',playground.ItShouldBe(snakeHeadX, snakeHeadY).ToString);
+ 
   if (playground.ItShouldBeBorder(snakeHeadX, snakeHeadY)) or (playground.ItShouldBeSnake(snakeHeadX, snakeHeadY)) then begin
-    writeln('lol');
     timer.Stop();
     GraphABC.TextOut(0, GraphABC.Window.Height - 16, 'Game Over');
     Redraw();
@@ -60,7 +58,7 @@ begin
   
   SnakeHandler(); // Обработчик движения змейки
   
-  playground.Update();
+  playground.Update(x1, y1, GraphABC.Window.Width - 80, GraphABC.Window.Height - 80);
   playground.Render();
   
   CollisionHandler(); // Обработчик столкновений
@@ -85,8 +83,7 @@ begin
   y2 := 260;
   cellSize := 20;
   
-  playground := MyPlayground.Playground.Create(x1, y1, x2, y2, cellSize);
+  playground := MyPlayground.Playground.Create(x1, y1, GraphABC.Window.Width - 80, GraphABC.Window.Height - 80, cellSize);
   playground.Render();
   arrayOfEmptys := playground.GetArrayOfEmptys();
-  writeln('AAAA:',arrayOfEmptys.queue);
 end.

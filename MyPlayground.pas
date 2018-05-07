@@ -24,7 +24,7 @@ type
     constructor Create(iX1: integer; iY1: integer; iX2: integer; iY2: integer; iCellSize: integer);
     
     procedure Render();
-    procedure Update();
+    procedure Update(x1:integer; y1:integer; x2:integer; y2:integer);
     procedure SetPlaygroundObjects();
     procedure SetBorder;
     
@@ -88,18 +88,18 @@ var
   currentColor:GraphABC.Color;
 begin
   GraphABC.SetPenColor(clDarkBlue);
-  GraphABC.DrawRectangle(x1, y1, x2 + 1, y2 + 1);
+  GraphABC.DrawRectangle(x1, y1, x1 + cellSize * Columns() + 1, y1 + cellSize * Rows() + 1);
   
   for var i := 1 to Columns() - 1 do 
   begin
     GraphABC.SetPenColor(rgb(211, 211, 211));
-    GraphABC.Line(x1 + i * cellSize, y1, x1 + i * cellSize, y2);
+    GraphABC.Line(x1 + i * cellSize, y1, x1 + i * cellSize, y1 + cellSize * Rows());
   end;
   
   for var i := 1 to Rows() - 1 do 
   begin
     GraphABC.SetPenColor(rgb(211, 211, 211));
-    GraphABC.Line(x1, y1 + i * cellSize, x2, y1 + i * cellSize);
+    GraphABC.Line(x1, y1 + i * cellSize, x1 + cellSize * Columns(), y1 + i * cellSize);
   end;
   
   for var j := 0 to rows() - 1 do 
@@ -118,8 +118,15 @@ begin
     end;
 end;
 
-procedure Playground.Update();
+procedure Playground.Update(x1:integer; y1:integer; x2:integer; y2:integer);
 begin
+  Self.x1 := x1;
+  Self.y1 := y1;
+  Self.x2 := x2;
+  Self.y2 := y2;
+  
+  SetLength(field, Columns(), Rows());
+  
   SetPlaygroundObjects();
 end;
 
