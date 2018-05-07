@@ -9,6 +9,7 @@ type
     y1: integer;
     x2: integer;
     y2: integer;
+    p: Picture;
     cellSize: integer;
     field: array [,] of integer;
     
@@ -24,9 +25,9 @@ type
     constructor Create(iX1: integer; iY1: integer; iX2: integer; iY2: integer; iCellSize: integer);
     
     procedure Render();
-    procedure Update();
+    procedure Update(x1:integer;y1:integer;x2:integer;y2:integer);
     procedure SetPlaygroundObjects();
-    procedure SetBorder;
+    //procedure SetBorder;
     
     function GetArrayOfEmptys():MyQueue.Queue;
     function ItShouldBe(x:integer; y:integer):string;
@@ -73,33 +74,25 @@ begin
     end;
 end;
 
-procedure Playground.SetBorder();
-begin
-  for var i := 0 to rows() - 1 do 
-    for var j := 0 to columns() - 1 do
-    begin
-      if (i = 0) or (i = (rows() - 1)) or (j = 0) or (j = columns() - 1) then
-        field[i, j] := borderId;
-    end;
-end;
+
 
 procedure Playground.Render();
 var
   currentColor:GraphABC.Color;
 begin
   GraphABC.SetPenColor(clDarkBlue);
-  GraphABC.DrawRectangle(x1, y1, x2 + 1, y2 + 1);
+  GraphABC.DrawRectangle(x1, y1, x1+cellsize*Columns() + 1,y1+cellsize*Rows() + 1);
   
   for var i := 1 to Columns() - 1 do 
   begin
     GraphABC.SetPenColor(rgb(211, 211, 211));
-    GraphABC.Line(x1 + i * cellSize, y1, x1 + i * cellSize, y2);
+    GraphABC.Line(x1 + i * cellSize, y1, x1 + i * cellSize, y1+cellsize*Rows());
   end;
   
   for var i := 1 to Rows() - 1 do 
   begin
     GraphABC.SetPenColor(rgb(211, 211, 211));
-    GraphABC.Line(x1, y1 + i * cellSize, x2, y1 + i * cellSize);
+    GraphABC.Line(x1, y1 + i * cellSize, x1+cellsize*Columns(), y1 + i * cellSize);
   end;
   
   for var j := 0 to rows() - 1 do 
@@ -118,8 +111,13 @@ begin
     end;
 end;
 
-procedure Playground.Update();
+procedure Playground.Update(x1:integer;y1:integer;x2:integer;y2:integer);
 begin
+  Self.x1:=x1;
+  Self.y1:=y1;
+  Self.x2:=x2;
+  Self.y2:=y2;
+  SetLength(field, Columns(), Rows());
   SetPlaygroundObjects();
 end;
 

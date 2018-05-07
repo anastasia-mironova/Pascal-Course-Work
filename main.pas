@@ -5,6 +5,7 @@ var
   arrayOfEmptys:MyQueue.Queue = MyQueue.Queue.Create();
   speed:integer := 500;
   iterator:integer := 0;
+  score:integer:=0;
   timer:Timers.Timer;
   
 procedure SnakeHandler();
@@ -20,14 +21,13 @@ begin
   if (snakeHeadX = playground.apple.x) and (snakeHeadY = playground.apple.y) then begin
     playground.snake.snakeGrow := true;
     playground.apple.RemoveApple();
+    score:=score+1;
     arrayOfEmptys:=playground.GetArrayOfEmptys();
     
     playground.apple.SetApple(arrayOfEmptys);
   end;
   
-  writeln('kek: ',snakeHeadX,' ',snakeHeadY,'; ',playground.ItShouldBe(snakeHeadX, snakeHeadY).ToString);
   if (playground.ItShouldBeBorder(snakeHeadX, snakeHeadY)) or (playground.ItShouldBeSnake(snakeHeadX, snakeHeadY)) then begin
-    writeln('lol');
     timer.Stop();
     GraphABC.TextOut(0, GraphABC.Window.Height - 16, 'Game Over');
     Redraw();
@@ -49,6 +49,8 @@ begin
     VK_Right: playground.snake.direction := 'right';
     VK_Down: playground.snake.direction := 'down';
     VK_Left: playground.snake.direction := 'left';
+    VK_P: timer.Stop();
+    VK_S: timer.Start();
   end;
 end;
   
@@ -60,14 +62,15 @@ begin
   
   SnakeHandler(); // Обработчик движения змейки
   
-  playground.Update();
+  playground.Update(x1,y1,GraphAbc.WindowWidth-40,GraphABC.WindowHeight-40);
   playground.Render();
   
   CollisionHandler(); // Обработчик столкновений
   
-  GraphABC.TextOut(0, 0, iterator.ToString());
-  GraphABC.TextOut(0, 16, 'snake head: [' + playground.snake.GetHead()[0].ToString() + '][' + playground.snake.GetHead()[1].ToString());
-  GraphABC.TextOut(0,48,'Apple: ['+playground.apple.GetApple[0].ToString+']['+playground.apple.GetApple[1].ToString+']');
+  GraphABC.TextOut(2, 24,'Time: '+ iterator.ToString());
+  GraphABC.TextOut(2,2,'Score: '+score.ToString);
+  GraphABC.TextOut(2, 46,'"P": Pause');
+  GraphABC.TextOut(2,68,'"S": Start');
   Inc(iterator);
   
   Redraw();
@@ -76,17 +79,14 @@ end;
 begin
   timer := Timers.Timer.Create(speed, Update);
   timer.Start();
-  
   OnKeyDown := KeyDown;
   
-  x1 := 80;
-  y1 := 100;
+  x1 := 120;
+  y1 := 40;
   x2 := 360;
   y2 := 260;
   cellSize := 20;
   
-  playground := MyPlayground.Playground.Create(x1, y1, x2, y2, cellSize);
+  playground := MyPlayground.Playground.Create(x1, y1,GraphAbc.WindowWidth-40,GraphABC.WindowHeight-40, cellSize);
   playground.Render();
-  arrayOfEmptys := playground.GetArrayOfEmptys();
-  writeln('AAAA:',arrayOfEmptys.queue);
 end.
