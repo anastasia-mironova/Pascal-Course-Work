@@ -22,5 +22,4 @@ begin
   asound.PlayLooping();
   
   end;
-GameKeyDown;
 end.

@@ -1,11 +1,8 @@
 ﻿uses GraphABC,Timers,MyPlayground,MyApple,MySnake,MyQueue,MyScreens,MyMenu;
 var
-  x1:integer := 100;
-  y1:integer := 80;
+  x1:integer := 20;
+  y1:integer := 20;
   cellSize: integer := 20;
-  
-  menuSoundtrack:System.Media.SoundPlayer;
-  gameSoundtrack:System.Media.SoundPlayer;
   
   screens: MyScreens.Screens;
   mainMenu: MyMenu.Menu;
@@ -13,7 +10,6 @@ var
   playground: MyPlayground.Playground;
   arrayOfEmptys: MyQueue.Queue = MyQueue.Queue.Create();
   speed: integer := 500;
-  iterator: integer := 0;
   timer: Timers.Timer;
 
 procedure EmptyProc();
@@ -33,7 +29,6 @@ begin
   if (snakeHeadX = playground.apple.x) and (snakeHeadY = playground.apple.y) then begin
     playground.snake.snakeGrow := true;
     playground.apple.RemoveApple();
-    score := score + 1;
     arrayOfEmptys := playground.GetArrayOfEmptys();
     
     playground.apple.SetApple(arrayOfEmptys);
@@ -63,24 +58,20 @@ begin
   
   CollisionHandler(); // Обработчик столкновений
   
-  GraphABC.TextOut(2, 24, 'Time: ' + iterator.ToString());
- 
-  Inc(iterator);
-  
   Redraw();
 end;
 
 // Game
 procedure GameInitialize();
 begin
-  playground := MyPlayground.Playground.Create(x1, y1, GraphAbc.WindowWidth - 40, GraphABC.WindowHeight - 40, cellSize);
+  playground := MyPlayground.Playground.Create(x1, y1, GraphAbc.WindowWidth - 20, GraphABC.WindowHeight - 20, cellSize);
 end;
 
 procedure GameProc();
 begin
   SnakeHandler(); // Обработчик движения змейки
   
-  playground.Update(x1, y1, GraphAbc.WindowWidth - 40, GraphABC.WindowHeight - 40);
+  playground.Update(x1, y1, GraphAbc.WindowWidth - 20, GraphABC.WindowHeight - 20);
   playground.Render();
 end;
 
@@ -160,12 +151,11 @@ end;
 // Main function
 
 begin
+  GraphABC.SetWindowCaption('Неверояные приключения змейки');
+  GraphABC.WindowCenter;
   timer := Timers.Timer.Create(speed, Update);
   timer.Start();
-  
-//  menuSoundtrack := System.Media.SoundPlayer.Create('sound/DanceDance.wav');
- // menuSoundtrack.PlayLooping();
-  //gameSoundtrack := System.Media.SoundPlayer.Create('sound/game.wav');
+ 
   
   mainMenu := new MyMenu.Menu();
   
@@ -180,10 +170,10 @@ begin
     pauseMenu.AddButton(btnExit, 'exit/exit.png', 'exit/exit_focus.png');
   
   screens := new MyScreens.Screens();
-  screens.AddScreen('Main menu', EmptyProc, MainMenuProc, MainMenuKeyDown,'sound/WickedGames.wav');
-  screens.AddScreen('Game', GameInitialize, GameProc, GameKeyDown,'sound/DanceDance.wav');
-  screens.AddScreen('Game over', EmptyProc, GameOverProc, GameOverKeyDown,'sound/DanceDance.wav');
-  screens.AddScreen('Pause menu',EmptyProc, PauseMenuProc, PauseMenuKeyDown,'sound/WikedGames.wav');
+  screens.AddScreen('Main menu', EmptyProc, MainMenuProc, MainMenuKeyDown);
+  screens.AddScreen('Game', GameInitialize, GameProc, GameKeyDown);
+  screens.AddScreen('Game over', EmptyProc, GameOverProc, GameOverKeyDown);
+  screens.AddScreen('Pause menu',EmptyProc, PauseMenuProc, PauseMenuKeyDown);
   screens.Activate('Main menu');
   
   GameInitialize();
