@@ -9,12 +9,14 @@ type
     queue: MyQueue.Queue;
     direction: string := 'up';
     snakeGrow: boolean := false;
+    
     constructor Create(x: integer; y: integer);
     procedure MoveUp();
     procedure MoveDown();
     procedure MoveRight();
     procedure MoveLeft();
     procedure Move();
+    
     function GetHead(): array of integer;
   end;
 
@@ -26,12 +28,16 @@ begin
   queue.Push(x, y);
 end;
 
+//Function 
+
 function Snake.GetHead(): array of integer;
 begin
   setlength(result, 2);
   Result[0] := queue.queue[0, 0];
   Result[1] := queue.queue[0, 1];
 end;
+
+//Procedure
 
 procedure Snake.MoveUp();
 var

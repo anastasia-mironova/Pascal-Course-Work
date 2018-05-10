@@ -7,12 +7,12 @@ type
     x: integer;
     y: integer;
     arrayOfEmptys: MyQueue.Queue;
-    constructor Create(x: integer; y: integer);
     
-    procedure SetApple(arrayOfEmptys:MyQueue.Queue);
+    constructor Create(x: integer; y: integer);
+    procedure SetApple(arrayOfEmptys: MyQueue.Queue);
     procedure RemoveApple();
     
-    function GetApple():array of integer;
+    function GetApple(): array of integer;
   end;
 
 
@@ -24,12 +24,14 @@ begin
   Self.y := y;
 end;
 
-procedure Apple.SetApple(arrayOfEmptys:MyQueue.Queue);
+//Procedure
+
+procedure Apple.SetApple(arrayOfEmptys: MyQueue.Queue);
 begin
-  var arrayLength:=arrayOfEmptys.length - 1;
-  var randomIndex:=random(arrayLength);
-  self.x:=arrayOfEmptys.queue[randomIndex,0];
-  self.y:=arrayOfEmptys.queue[randomIndex,1];
+  var arrayLength := arrayOfEmptys.length - 1;
+  var randomIndex := random(arrayLength);
+  self.x := arrayOfEmptys.queue[randomIndex, 0];
+  self.y := arrayOfEmptys.queue[randomIndex, 1];
 end;
 
 procedure Apple.RemoveApple();
@@ -39,7 +41,7 @@ begin
 end;
 
 // Functions 
-function Apple.GetApple():array of integer;
+function Apple.GetApple(): array of integer;
 begin
   SetLength(Result, 2);
   Result[0] := x;
